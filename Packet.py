@@ -1,6 +1,6 @@
 import sys
 
-class Packet:
+class Packet(object):
 	checkSum = None
 	length = None
 
