@@ -8,14 +8,15 @@ class SenderHelper(Helper):
 	def fileExists(fileName):
 		try:
 			file = open(fileName, 'r')
-			return True
+			return file
 		except Exception, e:
 			return False
 
 	@staticmethod
-	def createChunks(self, fileName):
+	def createChunks(fileName):
 		chunks = []
-		if(self.fileExists(fileName)):
+		file = SenderHelper.fileExists(fileName)
+		if(file):
 			while True:
 				data = file.readline(512)
 				if not data:
