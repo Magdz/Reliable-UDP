@@ -18,7 +18,7 @@ class SenderHelper(Helper):
 		file = SenderHelper.fileExists(fileName)
 		if(file):
 			while True:
-				data = file.readline(512)
+				data = file.readline(500)
 				if not data:
 					break
 				chunk = Chunk(data)
