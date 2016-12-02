@@ -1,11 +1,15 @@
 import sys
 
 class Datagram:
-	ip = None
-	port = None
+	ipFrom = None
+	portFrom = None
+	ipTo = None
+	portTo = None
 	packet = None
 
-	def __init__(self, ip, port, packet):
-		self.ip = ip
-		self.port = port
+	def __init__(self, ipFrom, portFrom, ipTo, portTo, packet):
+		self.ipFrom = ipFrom
+		self.portFrom = portFrom
+		self.ipTo = ipTo
+		self.portTo = portTo
 		self.packet = packet

@@ -20,5 +20,5 @@ class Server:
 			self.connection.bind((self.ip, self.port))
 			print "Server socket connection initialized"
 		except Exception, e:
-			print "Server socket connection faild: " + e
+			print "Server socket connection faild: " + str(e)
 			sys.exit()
