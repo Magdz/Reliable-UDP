@@ -1,0 +1,1 @@
+# here goes the properties and the functions of the Client as an Object
