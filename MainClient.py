@@ -42,13 +42,21 @@ while NEXTPACKET:
     RECVPCK = CLIENTSOCKET.recvfrom(1024)
     RECGRM = pickle.loads(RECVPCK[0])
     NEXTPACKET = False
-    RECPCKT = RECGRM.packet
-    if isinstance(RECPCKT, DataPacket) and RECPCKT.seqNo == SEQNO:
+    RECVPCK = RECGRM.packet
+    if isinstance(RECVPCK, DataPacket) and RECVPCK.seqNo == SEQNO:
         #Append chunk to chunks
-        CHUNKS.append(RECPCKT.chunk)
+        CHUNKS.append(RECVPCK.chunk)
         ACKNO = SEQNO
         ACK_MSG = AckPacket(ACKNO, None)
         ACK_SEND = pickle.dumps(ACK_MSG, -1)
         #Send ACK to server
         CLIENTSOCKET.sendto(ACK_SEND, ('127.0.0.1', 8888))
+        SEQNO = (SEQNO & 1) % 2
+    elif isinstance(RECVPCK, DataPacket) and RECVPCK.seqNo != SEQNO:
+        ACK_MSG = AckPacket(ACKNO, None)
+        ACK_SEND = pickle.dumps(ACK_MSG, -1)
+        #Send ACK to server
+        CLIENTSOCKET.sendto(ACK_SEND, ('127.0.0.1', 8888))
+    else:
+        pass
 sys.exit()

@@ -30,7 +30,8 @@ recvRequest = server.connection.recvfrom(1024)
 REQUESTS = recvRequest[0].split('\n')
 
 ip = recvRequest[1][0]
-filename = recvRequest[0]
+filename = REQUESTS[3]
+
 print "Received a request for " + str(filename)
 port = recvRequest[1][1]
 print "Request is received from IP: " + str(ip) + " from Port: " + str(port)
@@ -46,14 +47,17 @@ print "Sending Response: " + sendResponse
 # Split the file into chunks
 chunks = SenderHelper.createChunks(filename)
 print "Chunks Created"
+print len(chunks)
 
 # Start Processing
-for index, chunk in chunks:
+index = 0
+for chunk in chunks:
 	sendPacket = DataPacket(chunk, seqNo, checkSum)
 	sendGram = Datagram(myIp, myPort, ip, port, sendPacket)
 	sendMsg = pickle.dumps(sendGram, -1)
 	ackNo = seqNo
 	while True:
+		print str(sendGram.portTo)
 		server.connection.sendto(sendMsg, (sendGram.ipTo, sendGram.portTo))
 		print "Sending Packet #" + str(index)
 		print "Timer Started"
