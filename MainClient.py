@@ -8,6 +8,8 @@ from Client import Client
 from Datagram import Datagram
 from DataPacket import DataPacket
 from AckPacket import AckPacket
+from ReceiverHelper import ReceiverHelper
+
 
 REQUEST = open('request.txt', "rb")
 INPUT = REQUEST.read()
@@ -18,15 +20,14 @@ PORT = INPUT_LIST[1]
 #Create Socket Connection
 CLIENT = Client(SERVERNAME, PORT)
 CLIENTSOCKET = CLIENT.get_connection()
-#try:
-CLIENTSOCKET.sendto(INPUT, ('127.0.0.1', 8888))
-print 'Send Request Sent'
-"""
+try:
+    CLIENTSOCKET.sendto(INPUT, ('127.0.0.1', 8888))
+    print 'Send Request Sent'
 except socket.error:
     print 'Error establishing a connection to send request'
     print 'Server not found'
     sys.exit()
-"""
+
 #initial expected sequence  and ACK number
 SEQNO = 0
 ACKNO = 0
@@ -59,4 +60,7 @@ while NEXTPACKET:
         CLIENTSOCKET.sendto(ACK_SEND, ('127.0.0.1', 8888))
     else:
         pass
+    #CREATE FILE FROM CHUNK Datagram
+ReceiverHelper.create_file('NewFile.jpg', CHUNKS)
 sys.exit()
+
