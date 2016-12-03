@@ -24,7 +24,6 @@ class Client(object):
         except socket.error:
             print 'Failed to create a Client Socket'
             sys.exit()
-            
     def close_socket(self):
         """
         Close opened socket

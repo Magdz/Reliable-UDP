@@ -1,15 +1,17 @@
-# the main logic for running the server goes here.
+"""
+Main logic for running the server goes here.
+"""
 
 import sys
+import cPickle as pickle
 from Server import Server
 from SenderHelper import SenderHelper
 from DataPacket import DataPacket
 from AckPacket import AckPacket
 from Datagram import Datagram
-import cPickle as pickle
 
 myIp = '127.0.0.1'
-myPort = 80
+myPort = 8888
 seqNo = 0
 ackNo = 0
 checkSum = 0
@@ -19,23 +21,30 @@ server = Server(myIp, myPort)
 print "Server Started"
 
 # Waiting until a Request is received
+"""
+
+"""
 recvRequest = server.connection.recvfrom(1024)
-fileName = recvRequest[0]
-print "Received a request for " + str(fileName)
-ip = recvRequest[0][0]
-port = recvRequest[0][1]
+
+#INFO = recvRequest[1].split('\n')
+REQUESTS = recvRequest[0].split('\n')
+
+ip = recvRequest[1][0]
+filename = recvRequest[0]
+print "Received a request for " + str(filename)
+port = recvRequest[1][1]
 print "Request is received from IP: " + str(ip) + " from Port: " + str(port)
 
 # Check of file existance and send response
-if(SenderHelper.fileExists(fileName)):
+if(SenderHelper.fileExists(filename)):
 	sendResponse = "200 OK"
 else:
 	sendResponse = "404 Not Found"
-server.connection.sendto(sendResponse, (myIp, myPort))
-print sendResponse
+server.connection.sendto(sendResponse, (myIp, port))
+print "Sending Response: " + sendResponse
 
 # Split the file into chunks
-chunks = SenderHelper.createChunks(fileName)
+chunks = SenderHelper.createChunks(filename)
 print "Chunks Created"
 
 # Start Processing
