@@ -30,4 +30,8 @@ class Client(object):
         Close opened socket
         """
         self.__clientsocket.close()
-        
+    def get_connection(self):
+        """
+        get Client Socket Connection
+        """
+        return self.__clientsocket
