@@ -70,5 +70,6 @@ for index, chunk in chunks:
 			# stop timer
 			print "Timer Stopped"
 			print "Resending Packet #" + str(index)
+			
 print "All Packets are sent successfully"
 print "Closing the server"
