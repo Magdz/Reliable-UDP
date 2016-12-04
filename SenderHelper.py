@@ -1,5 +1,6 @@
 import sys
 from Helper import Helper
+import hashlib
 from Chunk import Chunk
 
 class SenderHelper(Helper):
@@ -24,3 +25,7 @@ class SenderHelper(Helper):
 				chunk = Chunk(data)
 				chunks.append(chunk)
 		return chunks
+
+	@staticmethod
+	def isCorrupt(chunk, checksum):
+		return str(hashlib.md5(chunk.getData()).hexdigest()) == checksum

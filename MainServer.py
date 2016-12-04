@@ -60,7 +60,7 @@ print "Length of CHUNKS is: " + str(len(CHUNKS))
 # Start Processing
 for chunk in CHUNKS:
     print "\n"
-    sendPacket = DataPacket(chunk, SEQNO, CHECKSUM)
+    sendPacket = DataPacket(chunk, SEQNO)
     sendGram = Datagram(HOSTNAME, PORT, IP, PORT, sendPacket)
     sendMsg = pickle.dumps(sendGram, -1)
     ACKNO = SEQNO
