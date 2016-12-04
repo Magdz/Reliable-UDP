@@ -17,6 +17,7 @@ class Server:
 		try:
 			# UDP Socket Connection
 			self.connection = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+			self.connection.settimeout(1)
 			self.connection.bind((self.ip, self.port))
 			print "Server socket connection initialized"
 		except Exception, e:

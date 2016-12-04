@@ -6,6 +6,7 @@ class Datagram:
 	ipTo = None
 	portTo = None
 	packet = None
+	PLP = None
 
 	def __init__(self, ipFrom, portFrom, ipTo, portTo, packet):
 		self.ipFrom = ipFrom
