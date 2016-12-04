@@ -38,7 +38,7 @@ CHUNKS = []
 #Receive Response from Server with file size
 RESPONSE = CLIENTSOCKET.recvfrom(1024)
 LENGTH = RESPONSE[0]
-print "Expected length of Packet: " + LENGTH
+print "Expected length of Packets: " + LENGTH
 INIT_LEN = 0
 
 while INIT_LEN < int(LENGTH):
@@ -84,6 +84,6 @@ while INIT_LEN < int(LENGTH):
 ReceiverHelper.update_progress(INIT_LEN/float(LENGTH))
 #CREATE FILE FROM CHUNKS
 print "Total Chunks Received is: " + str(sys.getsizeof(CHUNKS))
-print "Total Length of Chunk is: " + str(len(CHUNKS))
+print "Total Length of Chunks is: " + str(len(CHUNKS))
 ReceiverHelper.create_file('NewFile.jpg', CHUNKS)
 sys.exit()

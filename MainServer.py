@@ -66,7 +66,7 @@ for chunk in CHUNKS:
     ACKNO = SEQNO
 	#
     while True:
-        #sendGram.setprobability()
+        sendGram.setprobability()
         if not sendGram.isLost():
             SERVER.connection.sendto(sendMsg, (sendGram.ip_to, sendGram.port_to))
         print "Sending Packet #" + str(SEQNO)
