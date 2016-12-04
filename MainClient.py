@@ -39,11 +39,12 @@ CHUNKS = []
 
 #Receive Response from Server with file size
 RESPONSE = CLIENTSOCKET.recvfrom(1024)
-SIZE = RESPONSE[0]
-print "Expected Size of Packet: " + SIZE
-INIT_SIZE = 0
+LENGTH = RESPONSE[0]
+print "Expected length of Packet: " + LENGTH
+INIT_LEN = 0
 
-while INIT_SIZE <= int(SIZE):
+while INIT_LEN < int(LENGTH):
+    print "\n"
     #Receives data packet from the client
     print "Expecting Packet " + str(SEQNO)
     DATA_PICKLE = CLIENTSOCKET.recvfrom(1024)
@@ -55,7 +56,7 @@ while INIT_SIZE <= int(SIZE):
 
         #Append chunk to chunks
         print "Chunk added to List"
-        print "size of chunk is: " + str(len(DATA_PCK.chunk))
+        print "size of chunk is: " + str(sys.getsizeof(DATA_PCK.chunk))
         CHUNKS.append(DATA_PCK.chunk)
 
         #Let the ACKNO signal the same sequence number that has been received
@@ -67,12 +68,12 @@ while INIT_SIZE <= int(SIZE):
 
         #Send ACK to server and confirm that expected packet sequence number has been received
         CLIENT.udt_send_ack(ACKNO, '127.0.0.1', 8888)
-        INIT_SIZE = INIT_SIZE + len(DATA_PCK)
-        print "Current Size of Data is " + str(INIT_SIZE)
+        INIT_LEN += 1
+        print "Current Size of Data is " + str(sys.getsizeof(CHUNKS))
 
     else:#isinstance(DATA_PCK, DataPacket) and DATA_PCK.seqNo != SEQNO
         #Resend ACK to server
-        print "Client didnot receive expected SeqNo."
+        print "Client did not receive expected SeqNo."
         print "Expected SeqNo is: " + str(SEQNO)
         print "Received SeqNo is: " + str(DATA_PCK.seqNo)
         CLIENT.udt_send_ack(ACKNO, '127.0.0.1', 8888)
@@ -81,5 +82,5 @@ while INIT_SIZE <= int(SIZE):
 #CREATE FILE FROM CHUNKS
 print "Total Chunks Received is: " + str(sys.getsizeof(CHUNKS))
 print "Total Length of Chunk is: " + str(len(CHUNKS))
-ReceiverHelper.create_file('NewFile.txt', CHUNKS)
+ReceiverHelper.create_file('NewFile.jpg', CHUNKS)
 sys.exit()

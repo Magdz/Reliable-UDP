@@ -4,6 +4,7 @@ Main logic for running the server goes here.
 
 import sys
 import cPickle as pickle
+import os
 from Server import Server
 from SenderHelper import SenderHelper
 from DataPacket import DataPacket
@@ -49,6 +50,8 @@ print "Sending Response: " + sendResponse
 chunks = SenderHelper.createChunks(filename)
 print "Chunks Created"
 server.connection.sendto(str(len(chunks)), (myIp, port))
+print "Size of chunks is: "  + str(sys.getsizeof(chunks))
+print "Length of chunks is: " + str(len(chunks))
 
 # Start Processing
 #index = 0

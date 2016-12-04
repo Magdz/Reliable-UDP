@@ -7,7 +7,7 @@ class SenderHelper(Helper):
 	@staticmethod
 	def fileExists(fileName):
 		try:
-			file = open(fileName, 'r')
+			file = open(fileName, 'rb')
 			return file
 		except Exception, e:
 			return False
@@ -18,7 +18,7 @@ class SenderHelper(Helper):
 		file = SenderHelper.fileExists(fileName)
 		if(file):
 			while True:
-				data = file.readline(500)
+				data = file.read(500)
 				if not data:
 					break
 				chunk = Chunk(data)
