@@ -44,32 +44,35 @@ else:
 server.connection.sendto(sendResponse, (myIp, port))
 print "Sending Response: " + sendResponse
 
+
 # Split the file into chunks
 chunks = SenderHelper.createChunks(filename)
 print "Chunks Created"
-print len(chunks)
+server.connection.sendto(str(len(chunks)), (myIp, port))
 
 # Start Processing
-index = 0
+#index = 0
 for chunk in chunks:
+	print "\n"
 	sendPacket = DataPacket(chunk, seqNo, checkSum)
 	sendGram = Datagram(myIp, myPort, ip, port, sendPacket)
 	sendMsg = pickle.dumps(sendGram, -1)
 	ackNo = seqNo
 	while True:
-		print str(sendGram.portTo)
+		#print str(sendGram.portTo)
 		server.connection.sendto(sendMsg, (sendGram.ipTo, sendGram.portTo))
-		print "Sending Packet #" + str(index)
+		print "Sending Packet #" + str(seqNo)
 		print "Timer Started"
+		seqNo = ackNo
 		# start timer
-		print "Waiting for Ack #" + str(index)
+		print "Waiting for Ack #" + str(ackNo)
 		recvMsg = server.connection.recvfrom(1024)
 		recvGram = pickle.loads(recvMsg[0])
-		recvPacket = recvGram.packet
+		recvPacket = recvGram #.packet
 		if(type(recvPacket) is AckPacket):
 			print "Received Ack #" + str(recvPacket.ackNo)
 			if(recvPacket.ackNo == ackNo):
-				seqNo = (seqNo & 1) % 2
+				seqNo = 1 - seqNo
 				# stop timer
 				print "Timer Stopped"
 				break
@@ -77,12 +80,13 @@ for chunk in chunks:
 				print "Unexpected Ack"
 				# stop timer
 				print "Timer Stopped"
-				print "Resending Packet #" + str(index)
+				print "Resending Packet #" + str(seqNo)
 		else:
 			print "Received a corrupted packet"
 			# stop timer
 			print "Timer Stopped"
-			print "Resending Packet #" + str(index)
-			
+			print "Resending Packet #" + str(seqNo)
+		print "\n"
+
 print "All Packets are sent successfully"
 print "Closing the server"
