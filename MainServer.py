@@ -69,8 +69,9 @@ for chunk in chunks:
 	sendMsg = pickle.dumps(sendGram, -1)
 	ackNo = seqNo
 	while True:
-		#print str(sendGram.portTo)
-		server.connection.sendto(sendMsg, (sendGram.ipTo, sendGram.portTo))
+		sendGram.setProbability()
+		if not sendGram.isLost():
+			server.connection.sendto(sendMsg, (sendGram.ipTo, sendGram.portTo))
 		print "Sending Packet #" + str(seqNo)
 		print "Timer Started"
 		seqNo = ackNo
