@@ -3,6 +3,7 @@ Main logic for running the server goes here.
 """
 
 import sys
+import socket
 import cPickle as pickle
 import os
 from Server import Server
@@ -25,9 +26,15 @@ print "Server Started"
 """
 
 """
-recvRequest = server.connection.recvfrom(1024)
+WAITTOCONNECT = True
+while WAITTOCONNECT:
+	try:
+		recvRequest = server.connection.recvfrom(1024)
+		WAITTOCONNECT = False	
+	except socket.timeout:
+		pass
 
-#INFO = recvRequest[1].split('\n')
+# INFO = recvRequest[1].split('\n')
 REQUESTS = recvRequest[0].split('\n')
 
 ip = recvRequest[1][0]
@@ -69,7 +76,11 @@ for chunk in chunks:
 		seqNo = ackNo
 		# start timer
 		print "Waiting for Ack #" + str(ackNo)
-		recvMsg = server.connection.recvfrom(1024)
+		try:
+			recvMsg = server.connection.recvfrom(1024)
+		except socket.timeout:
+			print "Timeout"
+			continue
 		recvGram = pickle.loads(recvMsg[0])
 		recvPacket = recvGram #.packet
 		if(type(recvPacket) is AckPacket):
