@@ -1,5 +1,9 @@
-import socket
 import sys
+import cPickle as pickle
+from AckPacket import AckPacket
+import socket
+
+
 
 class Client(object):
     """
@@ -34,3 +38,10 @@ class Client(object):
         get Client Socket Connection
         """
         return self.__clientsocket
+    def udt_send_ack(self, ackno, servername, port):
+        """
+        sends ACK Packet to server
+        """
+        ackmsg = AckPacket(ackno, None)
+        acksend = pickle.dumps(ackmsg, -1)
+        self.__clientsocket.sendto(acksend, (servername, port))
