@@ -15,7 +15,7 @@ class Datagram(object):
         self.ip_to = ip_to
         self.port_to = port_to
         self.packet = packet
-        self.setprobability()
+        #self.setprobability()
     def setprobability(self):
         """
 		Simulate the Packet Loss with defining a random probability
