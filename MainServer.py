@@ -42,7 +42,7 @@ print "Received a request for " + str(FILENAME)
 print "Request is received from IP: " + str(IP) + " from PORT: " + str(PORT)
 
 # Check if file exists and send response
-if SenderHelper.fileExists(FILENAME):
+if SenderHelper.file_exists(FILENAME):
     SENDRESPONSE = "200 OK"
 else:
     SENDRESPONSE = "404 Not Found"
@@ -51,7 +51,7 @@ print "Sending Response: " + SENDRESPONSE
 
 
 # Split the file into CHUNKS
-CHUNKS = SenderHelper.createChunks(FILENAME)
+CHUNKS = SenderHelper.create_chunks(FILENAME)
 print "CHUNKS Created"
 SERVER.connection.sendto(str(len(CHUNKS)), (HOSTNAME, PORT))
 print "Size of CHUNKS is: "  + str(sys.getsizeof(CHUNKS))
