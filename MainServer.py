@@ -4,9 +4,10 @@ Main logic for running the server goes here.
 
 import sys
 import socket
-import cPickle as pickle
+from threading import Thread
+from random import randrange
 from Server import Server
-from AckPacket import AckPacket
+from SenderHelper import SenderHelper
 
 SERVERIP = '127.0.0.1'
 SERVERPORT = 8888
@@ -20,12 +21,14 @@ print "Server Started"
 """
 
 """
-WAITTOCONNECT = True
-while WAITTOCONNECT:
+REQUEST = None
+while not REQUEST:
 	try:
 		REQUEST = server.connection.recvfrom(1024)
-		server.handleThread(REQUEST)
-		sys.exit()
+		THREAD = Server(SERVERIP, randrange(2000, 8000))
+		THREADS.append(THREAD)
+		Thread(target=THREAD.handleThread, args=[REQUEST]).start()
 	except socket.timeout:
 		pass
 
+	

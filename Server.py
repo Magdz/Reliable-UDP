@@ -35,23 +35,23 @@ class Server:
 
 	def handleThread(self, REQUEST):
 		self.receiveRequest(REQUEST)
-
-		# Check of file existance and send response
 		self.sendResponse()
 
+		if not SenderHelper.fileExists(self.FILENAME):
+			sys.exit()
 		# Split the file into chunks
 		chunks = self.createChunks()
-
 		# Start Processing
 		self.processChunks(chunks)
-		pass
 
 	def receiveRequest(self, REQUEST):
+		print REQUEST
 		self.FILENAME = (REQUEST[0].split('\n'))[3]
 		self.CLIENTIP = REQUEST[1][0]
 		self.CLIENTPORT = REQUEST[1][1]
 		print "Received a request for " + str(self.FILENAME)
 		print "Request is received from IP: " + str(self.CLIENTIP) + " from Port: " + str(self.CLIENTPORT)
+		return self.FILENAME
 
 	def sendResponse(self):
 		if(SenderHelper.fileExists(self.FILENAME)):
