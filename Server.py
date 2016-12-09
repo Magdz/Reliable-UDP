@@ -9,8 +9,8 @@ from AckPacket import AckPacket
 from Datagram import Datagram
 
 class Server:
-	SERVERIP = '127.0.0.1'
-	SERVERPORT = 8888
+	SERVERIP = None
+	SERVERPORT = None
 	connection = None
 	CLIENTS = None
 
@@ -21,9 +21,11 @@ class Server:
 	ACKNO = 0
 	CHECKSUM = 0
 
-	def __init__(self):
+	def __init__(self, SERVERIP, SERVERPORT):
 		try:
 			# UDP Socket Connection
+			self.SERVERIP = SERVERIP
+			self.SERVERPORT = SERVERPORT
 			self.connection = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 			self.connection.settimeout(1)
 			self.connection.bind((self.SERVERIP, self.SERVERPORT))
@@ -66,3 +68,37 @@ class Server:
 			self.connection.sendto(MSG, (DATAGRAM.ipTo, DATAGRAM.portTo))
 		print "Sending Packet #" + str(self.SEQNO)
 		print "Timer Started"
+
+	def processChunks(self, chunks):
+		for chunk in chunks:
+			print "\n"
+			while True:
+				self.sendData(chunk)
+				print "Waiting for Ack #" + str(self.ACKNO)
+				try:
+					recvMsg = self.connection.recvfrom(1024)
+				except socket.timeout:
+					print "Timeout"
+					continue
+				recvGram = pickle.loads(recvMsg[0])
+				recvPacket = recvGram #.packet
+				if(type(recvPacket) is AckPacket):
+					print "Received Ack #" + str(recvPacket.ackNo)
+					if(recvPacket.ackNo == self.ACKNO):
+						self.SEQNO = 1 - self.SEQNO
+						# stop timer
+						print "Timer Stopped"
+						break
+					else:
+						print "Unexpected Ack"
+						# stop timer
+						print "Timer Stopped"
+						print "Resending Packet #" + str(self.SEQNO)
+				else:
+					print "Received a corrupted packet"
+					# stop timer
+					print "Timer Stopped"
+					print "Resending Packet #" + str(self.SEQNO)
+				print "\n"
+		print "All Packets are sent successfully"
+		print "Closing the server"
