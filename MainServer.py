@@ -10,10 +10,7 @@ from AckPacket import AckPacket
 
 SERVERIP = '127.0.0.1'
 SERVERPORT = 8888
-
-seqNo = 0
-ackNo = 0
-checkSum = 0
+THREADS = []
 
 # Starting Server
 server = Server(SERVERIP, SERVERPORT)
@@ -26,19 +23,9 @@ print "Server Started"
 WAITTOCONNECT = True
 while WAITTOCONNECT:
 	try:
-		recvRequest = server.connection.recvfrom(1024)
-		WAITTOCONNECT = False	
+		REQUEST = server.connection.recvfrom(1024)
+		server.handleThread(REQUEST)
+		sys.exit()
 	except socket.timeout:
 		pass
 
-server.receiveRequest(recvRequest)
-
-# Check of file existance and send response
-server.sendResponse()
-
-# Split the file into chunks
-chunks = server.createChunks()
-
-# Start Processing
-#index = 0
-server.processChunks(chunks)

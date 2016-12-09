@@ -12,7 +12,6 @@ class Server:
 	SERVERIP = None
 	SERVERPORT = None
 	connection = None
-	CLIENTS = None
 
 	FILENAME = None
 	CLIENTIP = None
@@ -29,11 +28,23 @@ class Server:
 			self.connection = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 			self.connection.settimeout(1)
 			self.connection.bind((self.SERVERIP, self.SERVERPORT))
-			self.CLIENTS = []
 			print "Server socket connection initialized"
 		except Exception, e:
 			print "Server socket connection faild: " + str(e)
 			sys.exit()
+
+	def handleThread(self, REQUEST):
+		self.receiveRequest(REQUEST)
+
+		# Check of file existance and send response
+		self.sendResponse()
+
+		# Split the file into chunks
+		chunks = self.createChunks()
+
+		# Start Processing
+		self.processChunks(chunks)
+		pass
 
 	def receiveRequest(self, REQUEST):
 		self.FILENAME = (REQUEST[0].split('\n'))[3]
