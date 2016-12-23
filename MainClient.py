@@ -58,11 +58,12 @@ while INIT_LEN < int(LENGTH):
         ACKNO = SEQNO
 
         #Change expected sequence number of next packet
-        SEQNO = 1 - SEQNO
+        SEQNO = SEQNO + 1
         #Send ACK to server and confirm that expected packet sequence number has been received
         CLIENT.udt_send_ack(ACKNO, SERVERNAME, DATA_DTG.portFrom)
+        
         INIT_LEN += 1
-    else:#isinstance(DATA_PCK, DataPacket) and DATA_PCK.seqNo != SEQNO
+    elif DATA_PCK.seqNo < SEQNO:
         #Resend ACK to server
         CLIENT.udt_send_ack(ACKNO, SERVERNAME, DATA_DTG.portFrom)
 

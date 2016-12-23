@@ -82,7 +82,7 @@ class Server:
 		DATAGRAM.setProbability()
 		if not DATAGRAM.isLost():
 			self.connection.sendto(MSG, (DATAGRAM.ipTo, DATAGRAM.portTo))
-		print "Sending Packet #" + str(self.SEQNO)
+		print "Sending Packet #" + str(PACKET.seqNo)
 		print "Timer Started"
 
 	def fillWindow(self, chunks):
@@ -93,7 +93,7 @@ class Server:
 		return PACKET
 
 	def SendWindow(self):
-		for i in range(0,self.WINDOW.qsize() - 1):
+		for i in range(0,self.WINDOW.qsize()):
 			PACKET = self.WINDOW.get()
 			self.sendData(PACKET)
 			self.WINDOW.put(PACKET)
@@ -111,10 +111,12 @@ class Server:
 			recvGram = pickle.loads(recvMsg[0])
 			recvPacket = recvGram #.packet
 			if type(recvPacket) is AckPacket:
+				print "It's an ACK packet of Number" + str(recvPacket.ackNo)
+				print "The base is : " + str(Base)
 				if recvPacket.ackNo > Base:
 					N = recvPacket.ackNo - Base
 					Base = recvPacket.ackNo
-					for i in range(0,N - 1):
+					for i in range(0,N ):
 						self.WINDOW.get()
 						PACKET = self.fillWindow(chunks)
 						self.sendData(PACKET)
