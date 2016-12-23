@@ -51,7 +51,8 @@ while INIT_LEN < int(LENGTH):
     DATA_PICKLE = CLIENTSOCKET.recvfrom(1024)
 
     #Extracts pickle to packet
-    DATA_PCK = pickle.loads(DATA_PICKLE[0]).packet
+    DATA_DTG = pickle.loads(DATA_PICKLE[0])
+    DATA_PCK = DATA_DTG.packet
     print "Received Packet " + str(DATA_PCK.seqNo)
     if isinstance(DATA_PCK, DataPacket) and DATA_PCK.seqNo == SEQNO:
 
@@ -68,7 +69,7 @@ while INIT_LEN < int(LENGTH):
         print "Expected SEQNO is " + str(SEQNO)
 
         #Send ACK to server and confirm that expected packet sequence number has been received
-        CLIENT.udt_send_ack(ACKNO, '127.0.0.1', 8888)
+        CLIENT.udt_send_ack(ACKNO, '127.0.0.1', DATA_DTG.portFrom)
         INIT_LEN += 1
         print "Current Size of Data is " + str(sys.getsizeof(CHUNKS))
 
@@ -77,7 +78,7 @@ while INIT_LEN < int(LENGTH):
         print "Client did not receive expected SeqNo."
         print "Expected SeqNo is: " + str(SEQNO)
         print "Received SeqNo is: " + str(DATA_PCK.seqNo)
-        CLIENT.udt_send_ack(ACKNO, '127.0.0.1', 8888)
+        CLIENT.udt_send_ack(ACKNO, '127.0.0.1', DATA_DTG.portFrom)
     print "\n"
 
 #CREATE FILE FROM CHUNKS
