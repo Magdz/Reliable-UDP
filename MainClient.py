@@ -36,7 +36,6 @@ ACKNO = 0
 #Receive Response from Server if file exists
 RESPONSE = CLIENTSOCKET.recvfrom(1024)
 print RESPONSE[0]
-CHUNKS = []
 
 #Receive Response from Server with file size
 RESPONSE = CLIENTSOCKET.recvfrom(1024)
@@ -55,8 +54,7 @@ while INIT_LEN < int(LENGTH):
     if isinstance(DATA_PCK, DataPacket) and DATA_PCK.seqNo == SEQNO:
 
         #Append chunk to chunks
-        CHUNKS.append(DATA_PCK.chunk)
-
+        ReceiverHelper.append_file('book2.jpg', DATA_PCK.chunk)
         #Let the ACKNO signal the same sequence number that has been received
         ACKNO = SEQNO
 
@@ -75,8 +73,4 @@ ReceiverHelper.update_progress(INIT_LEN/float(LENGTH))
 #CREATE FILE FROM CHUNKS
 print "Total Chunks Received is: " + str(sys.getsizeof(CHUNKS))
 print "Total Length of Chunk is: " + str(len(CHUNKS))
-if len(CHUNKS):
-    ReceiverHelper.create_file('book2.jpg', CHUNKS)
-else:
-    print "Nothing is recevied"
 sys.exit()

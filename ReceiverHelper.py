@@ -5,10 +5,10 @@ from Helper import Helper
 class ReceiverHelper(Helper):
 
 	@staticmethod
-	def create_file(fileName, chunks):
+	def append_file(fileName, chunk):
 		file = open(fileName, 'ab+')
-		for chunk in chunks:
-			file.write(chunk.getData())
+		file.write(chunk.getData())
+		
 	@staticmethod
 	def update_progress(progress):
 		barLength = 50 # Modify this to change the length of the progress bar
