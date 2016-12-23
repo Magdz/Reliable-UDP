@@ -11,18 +11,18 @@ from DataPacket import DataPacket
 from AckPacket import AckPacket
 from ReceiverHelper import ReceiverHelper
 
-
-REQUEST = open('request.txt', "rb")
-INPUT = REQUEST.read()
-INPUT_LIST = INPUT.split('\n')
+INPUT = raw_input("Enter request: ")
+INPUT_LIST = INPUT.split(' ')
 SERVERNAME = INPUT_LIST[0]
-PORT = INPUT_LIST[1]
+PORT = int(INPUT_LIST[1])
+FILENAME = INPUT_LIST[2]
+newfile = ReceiverHelper.setFilename(FILENAME)
 
 #Create Socket Connection
 CLIENT = Client(SERVERNAME, PORT)
 CLIENTSOCKET = CLIENT.get_connection()
 try:
-    CLIENTSOCKET.sendto(INPUT, ('127.0.0.1', 8888))
+    CLIENTSOCKET.sendto(FILENAME, (SERVERNAME, PORT))
     print 'Send Request Sent'
 except socket.error:
     print 'Error establishing a connection to send request'
@@ -50,27 +50,23 @@ while INIT_LEN < int(LENGTH):
     #Extracts pickle to packet
     DATA_DTG = pickle.loads(DATA_PICKLE[0])
     DATA_PCK = DATA_DTG.packet
-    
-    if isinstance(DATA_PCK, DataPacket) and DATA_PCK.seqNo == SEQNO:
 
+    if isinstance(DATA_PCK, DataPacket) and DATA_PCK.seqNo == SEQNO:
         #Append chunk to chunks
-        ReceiverHelper.append_file('book2.jpg', DATA_PCK.chunk)
+        ReceiverHelper.append_file(newfile, DATA_PCK.chunk)
         #Let the ACKNO signal the same sequence number that has been received
         ACKNO = SEQNO
 
         #Change expected sequence number of next packet
         SEQNO = 1 - SEQNO
-    
         #Send ACK to server and confirm that expected packet sequence number has been received
-        CLIENT.udt_send_ack(ACKNO, '127.0.0.1', DATA_DTG.portFrom)
+        CLIENT.udt_send_ack(ACKNO, SERVERNAME, DATA_DTG.portFrom)
         INIT_LEN += 1
-    
     else:#isinstance(DATA_PCK, DataPacket) and DATA_PCK.seqNo != SEQNO
         #Resend ACK to server
-        CLIENT.udt_send_ack(ACKNO, '127.0.0.1', DATA_DTG.portFrom)
+        CLIENT.udt_send_ack(ACKNO, SERVERNAME, DATA_DTG.portFrom)
 
 ReceiverHelper.update_progress(INIT_LEN/float(LENGTH))
 #CREATE FILE FROM CHUNKS
-print "Total Chunks Received is: " + str(sys.getsizeof(CHUNKS))
-print "Total Length of Chunk is: " + str(len(CHUNKS))
+print "Total Length of File Received: " + str(LENGTH)
 sys.exit()

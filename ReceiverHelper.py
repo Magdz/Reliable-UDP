@@ -31,3 +31,17 @@ class ReceiverHelper(Helper):
 	@staticmethod
 	def isCorrupt(chunk, checksum):
 		return str(hashlib.md5(chunk.getData()).hexdigest()) == checksum
+	
+	@staticmethod
+	def setFilename(filename):
+		seq = 1
+		file = open(filename, 'rb')
+		while (file):
+			splitList = filename.split('.')    
+			extension = splitList[1]
+			newfile = splitList[0] + '('+ str(seq) + ')' + '.' + extension
+			seq = seq + 1
+			try:
+				file = open(newfile, 'rb')
+			except:
+				return newfile

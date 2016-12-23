@@ -30,7 +30,7 @@ class Server:
 			self.connection.bind((self.SERVERIP, self.SERVERPORT))
 			print "Server socket connection initialized"
 		except Exception, e:
-			print "Server socket connection faild: " + str(e)
+			print "Server socket connection failed: " + str(e)
 			sys.exit()
 
 	def handleThread(self, REQUEST):
@@ -46,9 +46,10 @@ class Server:
 
 	def receiveRequest(self, REQUEST):
 		print REQUEST
-		self.FILENAME = (REQUEST[0].split('\n'))[3]
+		self.FILENAME = REQUEST[0]
 		self.CLIENTIP = REQUEST[1][0]
 		self.CLIENTPORT = REQUEST[1][1]
+		
 		print "Received a request for " + str(self.FILENAME)
 		print "Request is received from IP: " + str(self.CLIENTIP) + " from Port: " + str(self.CLIENTPORT)
 		return self.FILENAME
