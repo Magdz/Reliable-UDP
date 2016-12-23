@@ -2,6 +2,7 @@
 
 import sys
 import socket
+from Queue import Queue
 import cPickle as pickle
 from SenderHelper import SenderHelper
 from DataPacket import DataPacket
@@ -12,6 +13,7 @@ class Server:
 	SERVERIP = None
 	SERVERPORT = None
 	connection = None
+	WINDOW = None
 
 	FILENAME = None
 	CLIENTIP = None
@@ -28,6 +30,7 @@ class Server:
 			self.connection = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 			self.connection.settimeout(1)
 			self.connection.bind((self.SERVERIP, self.SERVERPORT))
+			self.WINDOW = Queue(maxsize=12)
 			print "Server socket connection initialized"
 		except Exception, e:
 			print "Server socket connection failed: " + str(e)
@@ -42,7 +45,8 @@ class Server:
 		# Split the file into chunks
 		chunks = self.createChunks()
 		# Start Processing
-		self.processChunks(chunks)
+		self.fillWindow(chunks)
+		# self.StopWait(chunks) # Stop and Wait
 
 	def receiveRequest(self, REQUEST):
 		print REQUEST
@@ -70,8 +74,7 @@ class Server:
 		print "Length of chunks is: " + str(len(chunks))
 		return chunks
 
-	def sendData(self, chunk):
-		PACKET = DataPacket(chunk, self.SEQNO, self.CHECKSUM)
+	def sendData(self, PACKET):
 		DATAGRAM = Datagram(self.SERVERIP, self.SERVERPORT, self.CLIENTIP, self.CLIENTPORT, PACKET)
 		MSG = pickle.dumps(DATAGRAM, -1)
 		self.ACKNO = self.SEQNO
@@ -81,11 +84,46 @@ class Server:
 		print "Sending Packet #" + str(self.SEQNO)
 		print "Timer Started"
 
-	def processChunks(self, chunks):
+	def fillWindow(self, chunks):
+		while not self.WINDOW.full():
+			PACKET = DataPacket(chunks[self.SEQNO], self.SEQNO, self.CHECKSUM)
+			self.WINDOW.put(PACKET)
+			self.SEQNO = self.SEQNO + 1
+		return PACKET
+
+	def SendWindow(self):
+		for i in range(0,self.WINDOW.qsize() - 1):
+			PACKET = self.WINDOW.get()
+			self.sendData(PACKET)
+			self.WINDOW.put(PACKET)
+
+	def GoBackN(self, chunks):
+		self.SendWindow()
+		Base = -1
+		while True:
+			try:
+				recvMsg = self.connection.recvfrom(1024)
+			except socket.timeout:
+				print "Timeout"
+				self.SendWindow()
+				continue
+			recvGram = pickle.loads(recvMsg[0])
+			recvPacket = recvGram #.packet
+			if type(recvPacket) is AckPacket:
+				if recvPacket.ackNo > Base:
+					N = recvPacket.ackNo - Base
+					Base = recvPacket.ackNo
+					for i in range(0,N - 1):
+						self.WINDOW.get()
+						PACKET = self.fillWindow(chunks)
+						self.sendData(PACKET)
+
+	def StopWait(self, chunks):
 		for chunk in chunks:
 			print "\n"
 			while True:
-				self.sendData(chunk)
+				PACKET = DataPacket(chunk, self.SEQNO, self.CHECKSUM)
+				self.sendData(PACKET)
 				print "Waiting for Ack #" + str(self.ACKNO)
 				try:
 					recvMsg = self.connection.recvfrom(1024)
