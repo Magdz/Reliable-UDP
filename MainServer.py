@@ -25,10 +25,11 @@ REQUEST = None
 while not REQUEST:
 	try:
 		REQUEST = server.connection.recvfrom(1024)
+		print "Request Received"
 		THREAD = Server(SERVERIP, randrange(2000, 8000))
 		THREADS.append(THREAD)
+		print "Thread Created"
 		Thread(target=THREAD.handleThread, args=[REQUEST]).start()
+		REQUEST = None
 	except socket.timeout:
 		pass
-
-	
