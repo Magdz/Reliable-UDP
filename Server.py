@@ -30,7 +30,7 @@ class Server:
 			self.connection = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 			self.connection.settimeout(1)
 			self.connection.bind((self.SERVERIP, self.SERVERPORT))
-			self.WINDOW = Queue(maxsize=12)
+			self.WINDOW = Queue(maxsize=512)
 			print "Server socket connection initialized"
 		except Exception, e:
 			print "Server socket connection failed: " + str(e)
@@ -86,7 +86,7 @@ class Server:
 		print "Timer Started"
 
 	def fillWindow(self, chunks):
-		while not self.WINDOW.full():
+		while not self.WINDOW.full() and self.SEQNO < len(chunks):
 			PACKET = DataPacket(chunks[self.SEQNO], self.SEQNO, self.CHECKSUM)
 			self.WINDOW.put(PACKET)
 			self.SEQNO = self.SEQNO + 1
@@ -102,6 +102,8 @@ class Server:
 		self.SendWindow()
 		Base = -1
 		while True:
+			if self.WINDOW.empty():
+				break
 			try:
 				recvMsg = self.connection.recvfrom(1024)
 			except socket.timeout:
@@ -116,10 +118,11 @@ class Server:
 				if recvPacket.ackNo > Base:
 					N = recvPacket.ackNo - Base
 					Base = recvPacket.ackNo
-					for i in range(0,N ):
+					for i in range(0,N):
 						self.WINDOW.get()
-						PACKET = self.fillWindow(chunks)
-						self.sendData(PACKET)
+						if self.SEQNO < len(chunks):
+							PACKET = self.fillWindow(chunks)
+							self.sendData(PACKET)
 
 	def StopWait(self, chunks):
 		for chunk in chunks:
