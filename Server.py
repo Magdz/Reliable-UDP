@@ -46,6 +46,7 @@ class Server:
 		chunks = self.createChunks()
 		# Start Processing
 		self.fillWindow(chunks)
+		self.GoBackN(chunks) # Go Back N
 		# self.StopWait(chunks) # Stop and Wait
 
 	def receiveRequest(self, REQUEST):
