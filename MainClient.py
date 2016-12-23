@@ -41,24 +41,20 @@ CHUNKS = []
 #Receive Response from Server with file size
 RESPONSE = CLIENTSOCKET.recvfrom(1024)
 LENGTH = RESPONSE[0]
-print "Expected length of Packet: " + LENGTH
 INIT_LEN = 0
 
 while INIT_LEN < int(LENGTH):
-    print "\n"
+    ReceiverHelper.update_progress(INIT_LEN/float(LENGTH))
     #Receives data packet from the client
-    print "Expecting Packet " + str(SEQNO)
     DATA_PICKLE = CLIENTSOCKET.recvfrom(1024)
 
     #Extracts pickle to packet
     DATA_DTG = pickle.loads(DATA_PICKLE[0])
     DATA_PCK = DATA_DTG.packet
-    print "Received Packet " + str(DATA_PCK.seqNo)
+    
     if isinstance(DATA_PCK, DataPacket) and DATA_PCK.seqNo == SEQNO:
 
         #Append chunk to chunks
-        print "Chunk added to List"
-        print "size of chunk is: " + str(sys.getsizeof(DATA_PCK.chunk))
         CHUNKS.append(DATA_PCK.chunk)
 
         #Let the ACKNO signal the same sequence number that has been received
@@ -66,21 +62,16 @@ while INIT_LEN < int(LENGTH):
 
         #Change expected sequence number of next packet
         SEQNO = 1 - SEQNO
-        print "Expected SEQNO is " + str(SEQNO)
-
+    
         #Send ACK to server and confirm that expected packet sequence number has been received
         CLIENT.udt_send_ack(ACKNO, '127.0.0.1', DATA_DTG.portFrom)
         INIT_LEN += 1
-        print "Current Size of Data is " + str(sys.getsizeof(CHUNKS))
-
+    
     else:#isinstance(DATA_PCK, DataPacket) and DATA_PCK.seqNo != SEQNO
         #Resend ACK to server
-        print "Client did not receive expected SeqNo."
-        print "Expected SeqNo is: " + str(SEQNO)
-        print "Received SeqNo is: " + str(DATA_PCK.seqNo)
         CLIENT.udt_send_ack(ACKNO, '127.0.0.1', DATA_DTG.portFrom)
-    print "\n"
 
+ReceiverHelper.update_progress(INIT_LEN/float(LENGTH))
 #CREATE FILE FROM CHUNKS
 print "Total Chunks Received is: " + str(sys.getsizeof(CHUNKS))
 print "Total Length of Chunk is: " + str(len(CHUNKS))
